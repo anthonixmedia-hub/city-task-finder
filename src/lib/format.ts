@@ -22,3 +22,7 @@ export const CONTACT_EMAIL = "mycityrozgar@gmail.com";
 export const CONTACT_PHONE = "+91 6287 585752";
 export const CONTACT_ADDRESS =
   "Near Central Bank, Rashikpur, Sonwadangal, SP College Road, Dumka 814101";
+
+// Columns safe to expose without the protected `phone` field.
+export const JOB_PUBLIC_COLUMNS =
+  "id,customer_id,title,category_slug,description,budget_min,budget_max,city,area,preferred_time,urgent,status,responses_count,created_at,updated_at";
