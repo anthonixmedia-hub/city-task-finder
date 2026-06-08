@@ -2,17 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { Briefcase, Home, LayoutDashboard, Plus, User } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import logoAsset from "@/assets/logo.png.asset.json";
 
 export function SiteHeader() {
   const { user, profile, signOut } = useAuth();
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="container-app flex h-14 items-center justify-between gap-3">
-        <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            MC
-          </span>
-          <span className="hidden sm:inline">MyCityRozgar<span className="text-primary">.in</span></span>
+        <Link to="/" className="flex items-center gap-2 font-display font-bold text-base sm:text-lg min-w-0">
+          <img src={logoAsset.url} alt="MyCityRozgar logo" className="h-9 w-9 rounded-lg object-contain shrink-0" />
+          <span className="truncate">MyCityRozgar<span className="text-primary">.in</span></span>
         </Link>
         <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
           <Link to="/jobs" className="px-3 py-2 rounded-md hover:bg-muted">Browse Jobs</Link>
@@ -93,7 +92,8 @@ export function SiteFooter() {
     <footer className="mt-16 border-t border-border bg-muted/40">
       <div className="container-app py-10 grid gap-8 md:grid-cols-4">
         <div>
-          <div className="font-display font-bold text-lg">
+          <div className="flex items-center gap-2 font-display font-bold text-lg">
+            <img src={logoAsset.url} alt="MyCityRozgar logo" className="h-8 w-8 rounded-lg object-contain" />
             MyCityRozgar<span className="text-primary">.in</span>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
