@@ -155,7 +155,7 @@ function WorkerDash() {
   const { data: jobs } = useQuery({
     queryKey: ["worker-feed", profile?.city],
     queryFn: async () => {
-      let q = supabase.from("jobs").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(30);
+      let q = supabase.from("jobs").select(JOB_PUBLIC_COLUMNS).eq("status", "active").order("created_at", { ascending: false }).limit(30);
       if (profile?.city) q = q.eq("city", profile.city);
       return (await q).data ?? [];
     },
