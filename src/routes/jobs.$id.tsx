@@ -97,12 +97,30 @@ function JobDetail() {
             </div>
 
             {unlocked ? (
-              <div className="mt-4 grid sm:grid-cols-2 gap-2">
-                <a href={`tel:${job.phone}`}><Button className="w-full" size="lg"><Phone className="mr-2 h-4 w-4"/>{job.phone}</Button></a>
-                <a href={`https://wa.me/${job.phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">
-                  <Button variant="outline" className="w-full" size="lg"><MessageCircle className="mr-2 h-4 w-4"/>WhatsApp</Button>
-                </a>
-              </div>
+              phone ? (
+                <div className="mt-4 grid sm:grid-cols-2 gap-2">
+                  <a href={`tel:${phone}`}><Button className="w-full" size="lg"><Phone className="mr-2 h-4 w-4"/>{phone}</Button></a>
+                  <a href={`https://wa.me/${phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">
+                    <Button variant="outline" className="w-full" size="lg"><MessageCircle className="mr-2 h-4 w-4"/>WhatsApp</Button>
+                  </a>
+                </div>
+              ) : (
+                <div className="mt-4">
+                  <Button
+                    size="lg"
+                    disabled={revealing}
+                    onClick={async () => {
+                      setRevealing(true);
+                      const { data, error } = await supabase.rpc("get_job_phone", { _job_id: id });
+                      setRevealing(false);
+                      if (error) { toast.error(error.message); return; }
+                      setPhone(data as string);
+                    }}
+                  >
+                    <Phone className="mr-2 h-4 w-4"/>{revealing ? "Loading…" : "Reveal phone number"}
+                  </Button>
+                </div>
+              )
             ) : (
               <div className="mt-4 rounded-xl bg-muted p-4">
                 <div className="flex items-start gap-3">
