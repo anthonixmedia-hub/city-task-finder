@@ -84,7 +84,7 @@ function AdminContent() {
 
   const { data: recentJobs } = useQuery({
     queryKey: ["admin-jobs"],
-    queryFn: async () => (await supabase.from("jobs").select("*").order("created_at", { ascending: false }).limit(20)).data ?? [],
+    queryFn: async () => (await supabase.from("jobs").select("id,customer_id,title,category_slug,city,area,status,urgent,responses_count,created_at").order("created_at", { ascending: false }).limit(20)).data ?? [],
   });
 
   const [planForNew, setPlanForNew] = useState<"premium" | "professional">("premium");
