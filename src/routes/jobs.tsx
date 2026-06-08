@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { PageShell } from "@/components/layout";
 import { supabase } from "@/integrations/supabase/client";
-import { timeAgo, formatBudget } from "@/lib/format";
+import { timeAgo, formatBudget, JOB_PUBLIC_COLUMNS } from "@/lib/format";
 import { z } from "zod";
 
 const searchSchema = z.object({
