@@ -23,6 +23,8 @@ function JobDetail() {
   const { id } = Route.useParams();
   const { profile } = useAuth();
   const [unlockOpen, setUnlockOpen] = useState(false);
+  const [phone, setPhone] = useState<string | null>(null);
+  const [revealing, setRevealing] = useState(false);
 
   const { data: job, isLoading } = useQuery({
     queryKey: ["job", id],
