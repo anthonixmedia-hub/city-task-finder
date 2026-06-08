@@ -8,14 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PageShell } from "@/components/layout";
 import { supabase } from "@/integrations/supabase/client";
-import { timeAgo, formatBudget } from "@/lib/format";
+import { timeAgo, formatBudget, JOB_PUBLIC_COLUMNS } from "@/lib/format";
 
 const homeData = queryOptions({
   queryKey: ["home-data"],
   queryFn: async () => {
     const [cats, jobs] = await Promise.all([
       supabase.from("categories").select("*").order("sort_order").limit(12),
-      supabase.from("jobs").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(6),
+      supabase.from("jobs").select(JOB_PUBLIC_COLUMNS).eq("status", "active").order("created_at", { ascending: false }).limit(6),
     ]);
     return { categories: cats.data ?? [], jobs: jobs.data ?? [] };
   },
