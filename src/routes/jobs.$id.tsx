@@ -27,7 +27,7 @@ function JobDetail() {
   const { data: job, isLoading } = useQuery({
     queryKey: ["job", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("jobs").select("*").eq("id", id).maybeSingle();
+      const { data, error } = await supabase.from("jobs").select(JOB_PUBLIC_COLUMNS).eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -37,7 +37,8 @@ function JobDetail() {
     queryKey: ["job-customer", job?.customer_id],
     queryFn: async () => {
       if (!job) return null;
-      return (await supabase.from("profiles").select("full_name,city").eq("id", job.customer_id).maybeSingle()).data;
+      const { data } = await supabase.rpc("get_public_profile", { _id: job.customer_id });
+      return data?.[0] ?? null;
     },
     enabled: !!job,
   });
