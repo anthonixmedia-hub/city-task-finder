@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Briefcase, Home, LayoutDashboard, Plus, User } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import logoAsset from "@/assets/logo.png.asset.json";
 
 export function SiteHeader() {
   const { user, profile, signOut } = useAuth();
