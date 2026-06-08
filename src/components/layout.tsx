@@ -92,7 +92,8 @@ export function SiteFooter() {
     <footer className="mt-16 border-t border-border bg-muted/40">
       <div className="container-app py-10 grid gap-8 md:grid-cols-4">
         <div>
-          <div className="font-display font-bold text-lg">
+          <div className="flex items-center gap-2 font-display font-bold text-lg">
+            <img src={logoAsset.url} alt="MyCityRozgar logo" className="h-8 w-8 rounded-lg object-contain" />
             MyCityRozgar<span className="text-primary">.in</span>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
