@@ -14,16 +14,257 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      access_codes: {
+        Row: {
+          assigned_to: string | null
+          code: string
+          created_at: string
+          id: string
+          notes: string | null
+          plan: Database["public"]["Enums"]["plan_tier"]
+          used: boolean
+          used_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plan?: Database["public"]["Enums"]["plan_tier"]
+          used?: boolean
+          used_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plan?: Database["public"]["Enums"]["plan_tier"]
+          used?: boolean
+          used_at?: string | null
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      job_applications: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          message: string | null
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          message?: string | null
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          message?: string | null
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_applications_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          area: string | null
+          budget_max: number | null
+          budget_min: number | null
+          category_slug: string
+          city: string
+          created_at: string
+          customer_id: string
+          description: string
+          id: string
+          phone: string
+          preferred_time: string | null
+          responses_count: number
+          status: Database["public"]["Enums"]["job_status"]
+          title: string
+          updated_at: string
+          urgent: boolean
+        }
+        Insert: {
+          area?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
+          category_slug: string
+          city?: string
+          created_at?: string
+          customer_id: string
+          description: string
+          id?: string
+          phone: string
+          preferred_time?: string | null
+          responses_count?: number
+          status?: Database["public"]["Enums"]["job_status"]
+          title: string
+          updated_at?: string
+          urgent?: boolean
+        }
+        Update: {
+          area?: string | null
+          budget_max?: number | null
+          budget_min?: number | null
+          category_slug?: string
+          city?: string
+          created_at?: string
+          customer_id?: string
+          description?: string
+          id?: string
+          phone?: string
+          preferred_time?: string | null
+          responses_count?: number
+          status?: Database["public"]["Enums"]["job_status"]
+          title?: string
+          updated_at?: string
+          urgent?: boolean
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          access_unlocked: boolean
+          area: string | null
+          bio: string | null
+          category: string | null
+          city: string | null
+          created_at: string
+          documents_verified: boolean
+          email: string | null
+          experience_years: number | null
+          full_name: string
+          id: string
+          mobile: string | null
+          mobile_verified: boolean
+          photo_url: string | null
+          plan: Database["public"]["Enums"]["plan_tier"]
+          role: Database["public"]["Enums"]["user_type"]
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          access_unlocked?: boolean
+          area?: string | null
+          bio?: string | null
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          documents_verified?: boolean
+          email?: string | null
+          experience_years?: number | null
+          full_name?: string
+          id: string
+          mobile?: string | null
+          mobile_verified?: boolean
+          photo_url?: string | null
+          plan?: Database["public"]["Enums"]["plan_tier"]
+          role?: Database["public"]["Enums"]["user_type"]
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          access_unlocked?: boolean
+          area?: string | null
+          bio?: string | null
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          documents_verified?: boolean
+          email?: string | null
+          experience_years?: number | null
+          full_name?: string
+          id?: string
+          mobile?: string | null
+          mobile_verified?: boolean
+          photo_url?: string | null
+          plan?: Database["public"]["Enums"]["plan_tier"]
+          role?: Database["public"]["Enums"]["user_type"]
+          updated_at?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
+      job_status: "active" | "closed" | "completed"
+      plan_tier: "free" | "premium" | "professional"
+      user_type: "customer" | "worker"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +391,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+      job_status: ["active", "closed", "completed"],
+      plan_tier: ["free", "premium", "professional"],
+      user_type: ["customer", "worker"],
+    },
   },
 } as const
