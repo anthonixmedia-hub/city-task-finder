@@ -11,7 +11,7 @@ import { PageShell } from "@/components/layout";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { timeAgo, formatBudget } from "@/lib/format";
+import { timeAgo, formatBudget, JOB_PUBLIC_COLUMNS } from "@/lib/format";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard")({
@@ -80,7 +80,7 @@ function CustomerDash() {
   const { user } = useAuth();
   const { data: jobs, refetch } = useQuery({
     queryKey: ["my-jobs", user?.id],
-    queryFn: async () => (await supabase.from("jobs").select("*").eq("customer_id", user!.id).order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await supabase.from("jobs").select(JOB_PUBLIC_COLUMNS).eq("customer_id", user!.id).order("created_at", { ascending: false })).data ?? [],
     enabled: !!user,
   });
 
@@ -155,7 +155,7 @@ function WorkerDash() {
   const { data: jobs } = useQuery({
     queryKey: ["worker-feed", profile?.city],
     queryFn: async () => {
-      let q = supabase.from("jobs").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(30);
+      let q = supabase.from("jobs").select(JOB_PUBLIC_COLUMNS).eq("status", "active").order("created_at", { ascending: false }).limit(30);
       if (profile?.city) q = q.eq("city", profile.city);
       return (await q).data ?? [];
     },

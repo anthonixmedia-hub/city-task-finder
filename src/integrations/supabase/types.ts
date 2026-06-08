@@ -252,6 +252,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_job_phone: { Args: { _job_id: string }; Returns: string }
+      get_public_profile: {
+        Args: { _id: string }
+        Returns: {
+          area: string
+          bio: string
+          category: string
+          city: string
+          experience_years: number
+          full_name: string
+          id: string
+          photo_url: string
+          plan: Database["public"]["Enums"]["plan_tier"]
+          role: Database["public"]["Enums"]["user_type"]
+          verified: boolean
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -259,6 +276,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      redeem_access_code: { Args: { _code: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "user"

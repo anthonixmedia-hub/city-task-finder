@@ -11,7 +11,8 @@ import { PageShell } from "@/components/layout";
 import { UnlockDialog } from "@/components/unlock-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { timeAgo, formatBudget } from "@/lib/format";
+import { timeAgo, formatBudget, JOB_PUBLIC_COLUMNS } from "@/lib/format";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/jobs/$id")({
   head: () => ({ meta: [{ title: "Job Details — MyCityRozgar.in" }] }),
@@ -22,11 +23,13 @@ function JobDetail() {
   const { id } = Route.useParams();
   const { profile } = useAuth();
   const [unlockOpen, setUnlockOpen] = useState(false);
+  const [phone, setPhone] = useState<string | null>(null);
+  const [revealing, setRevealing] = useState(false);
 
   const { data: job, isLoading } = useQuery({
     queryKey: ["job", id],
     queryFn: async () => {
-      const { data, error } = await supabase.from("jobs").select("*").eq("id", id).maybeSingle();
+      const { data, error } = await supabase.from("jobs").select(JOB_PUBLIC_COLUMNS).eq("id", id).maybeSingle();
       if (error) throw error;
       return data;
     },
@@ -36,7 +39,8 @@ function JobDetail() {
     queryKey: ["job-customer", job?.customer_id],
     queryFn: async () => {
       if (!job) return null;
-      return (await supabase.from("profiles").select("full_name,city").eq("id", job.customer_id).maybeSingle()).data;
+      const { data } = await supabase.rpc("get_public_profile", { _id: job.customer_id });
+      return data?.[0] ?? null;
     },
     enabled: !!job,
   });
@@ -93,12 +97,30 @@ function JobDetail() {
             </div>
 
             {unlocked ? (
-              <div className="mt-4 grid sm:grid-cols-2 gap-2">
-                <a href={`tel:${job.phone}`}><Button className="w-full" size="lg"><Phone className="mr-2 h-4 w-4"/>{job.phone}</Button></a>
-                <a href={`https://wa.me/${job.phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">
-                  <Button variant="outline" className="w-full" size="lg"><MessageCircle className="mr-2 h-4 w-4"/>WhatsApp</Button>
-                </a>
-              </div>
+              phone ? (
+                <div className="mt-4 grid sm:grid-cols-2 gap-2">
+                  <a href={`tel:${phone}`}><Button className="w-full" size="lg"><Phone className="mr-2 h-4 w-4"/>{phone}</Button></a>
+                  <a href={`https://wa.me/${phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">
+                    <Button variant="outline" className="w-full" size="lg"><MessageCircle className="mr-2 h-4 w-4"/>WhatsApp</Button>
+                  </a>
+                </div>
+              ) : (
+                <div className="mt-4">
+                  <Button
+                    size="lg"
+                    disabled={revealing}
+                    onClick={async () => {
+                      setRevealing(true);
+                      const { data, error } = await supabase.rpc("get_job_phone", { _job_id: id });
+                      setRevealing(false);
+                      if (error) { toast.error(error.message); return; }
+                      setPhone(data as string);
+                    }}
+                  >
+                    <Phone className="mr-2 h-4 w-4"/>{revealing ? "Loading…" : "Reveal phone number"}
+                  </Button>
+                </div>
+              )
             ) : (
               <div className="mt-4 rounded-xl bg-muted p-4">
                 <div className="flex items-start gap-3">

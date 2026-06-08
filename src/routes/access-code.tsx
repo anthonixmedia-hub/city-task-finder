@@ -26,24 +26,8 @@ function AccessCodePage() {
     setLoading(true);
     try {
       const normalized = code.trim().toUpperCase();
-      const { data: ac, error } = await supabase
-        .from("access_codes").select("*").eq("code", normalized).maybeSingle();
+      const { error } = await supabase.rpc("redeem_access_code", { _code: normalized });
       if (error) throw error;
-      if (!ac) { toast.error("Invalid Access Code. Please check and try again."); return; }
-      if (ac.used && ac.assigned_to !== user.id) { toast.error("This code has already been used."); return; }
-
-      // Mark code used + bind to user
-      await supabase.from("access_codes").update({
-        used: true, used_at: new Date().toISOString(), assigned_to: user.id,
-      }).eq("id", ac.id);
-
-      // Update profile
-      await supabase.from("profiles").update({
-        access_unlocked: true,
-        plan: ac.plan,
-        verified: true,
-      }).eq("id", user.id);
-
       await refreshProfile();
       toast.success("Access unlocked! You can now contact customers.");
       navigate({ to: "/jobs" });
