@@ -45,6 +45,10 @@ function PostJob() {
     if (!user) { navigate({ to: "/auth" }); return; }
     setLoading(true);
     try {
+      // Save contact phone on the user's profile (used by secure get_job_phone RPC).
+      if (form.phone) {
+        await supabase.from("profiles").update({ mobile: form.phone }).eq("id", user.id);
+      }
       const { error } = await supabase.from("jobs").insert({
         customer_id: user.id,
         title: form.title,
@@ -54,7 +58,6 @@ function PostJob() {
         budget_max: form.budget_max ? Number(form.budget_max) : null,
         city: form.city,
         area: form.area || null,
-        phone: form.phone,
         preferred_time: form.preferred_time || null,
         urgent: form.urgent,
       });

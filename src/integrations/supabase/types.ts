@@ -120,7 +120,6 @@ export type Database = {
           customer_id: string
           description: string
           id: string
-          phone: string
           preferred_time: string | null
           responses_count: number
           status: Database["public"]["Enums"]["job_status"]
@@ -138,7 +137,6 @@ export type Database = {
           customer_id: string
           description: string
           id?: string
-          phone: string
           preferred_time?: string | null
           responses_count?: number
           status?: Database["public"]["Enums"]["job_status"]
@@ -156,7 +154,6 @@ export type Database = {
           customer_id?: string
           description?: string
           id?: string
-          phone?: string
           preferred_time?: string | null
           responses_count?: number
           status?: Database["public"]["Enums"]["job_status"]
