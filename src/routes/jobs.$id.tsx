@@ -11,7 +11,8 @@ import { PageShell } from "@/components/layout";
 import { UnlockDialog } from "@/components/unlock-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { timeAgo, formatBudget } from "@/lib/format";
+import { timeAgo, formatBudget, JOB_PUBLIC_COLUMNS } from "@/lib/format";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/jobs/$id")({
   head: () => ({ meta: [{ title: "Job Details — MyCityRozgar.in" }] }),
