@@ -34,7 +34,7 @@ function JobsList() {
   const { data: jobs, isLoading } = useQuery({
     queryKey: ["jobs", search.category, search.city, q],
     queryFn: async () => {
-      let query = supabase.from("jobs").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(50);
+      let query = supabase.from("jobs").select(JOB_PUBLIC_COLUMNS).eq("status", "active").order("created_at", { ascending: false }).limit(50);
       if (search.category) query = query.eq("category_slug", search.category);
       if (search.city) query = query.ilike("city", `%${search.city}%`);
       if (q) query = query.ilike("title", `%${q}%`);
