@@ -80,7 +80,7 @@ function CustomerDash() {
   const { user } = useAuth();
   const { data: jobs, refetch } = useQuery({
     queryKey: ["my-jobs", user?.id],
-    queryFn: async () => (await supabase.from("jobs").select("*").eq("customer_id", user!.id).order("created_at", { ascending: false })).data ?? [],
+    queryFn: async () => (await supabase.from("jobs").select(JOB_PUBLIC_COLUMNS).eq("customer_id", user!.id).order("created_at", { ascending: false })).data ?? [],
     enabled: !!user,
   });
 
