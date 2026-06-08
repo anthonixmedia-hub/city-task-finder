@@ -10,10 +10,9 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="container-app flex h-14 items-center justify-between gap-3">
         <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            MC
-          </span>
+          <img src={logoAsset.url} alt="MyCityRozgar logo" className="h-9 w-9 rounded-lg object-contain" />
           <span className="hidden sm:inline">MyCityRozgar<span className="text-primary">.in</span></span>
+          <span className="sm:hidden">MyCityRozgar<span className="text-primary">.in</span></span>
         </Link>
         <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
           <Link to="/jobs" className="px-3 py-2 rounded-md hover:bg-muted">Browse Jobs</Link>
