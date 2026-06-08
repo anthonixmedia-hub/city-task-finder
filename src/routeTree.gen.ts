@@ -9,38 +9,214 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WhatsappApprovalRouteImport } from './routes/whatsapp-approval'
+import { Route as PostJobRouteImport } from './routes/post-job'
+import { Route as PlansRouteImport } from './routes/plans'
+import { Route as JobsRouteImport } from './routes/jobs'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AccessCodeRouteImport } from './routes/access-code'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as JobsIdRouteImport } from './routes/jobs.$id'
 
+const WhatsappApprovalRoute = WhatsappApprovalRouteImport.update({
+  id: '/whatsapp-approval',
+  path: '/whatsapp-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostJobRoute = PostJobRouteImport.update({
+  id: '/post-job',
+  path: '/post-job',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlansRoute = PlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JobsRoute = JobsRouteImport.update({
+  id: '/jobs',
+  path: '/jobs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccessCodeRoute = AccessCodeRouteImport.update({
+  id: '/access-code',
+  path: '/access-code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JobsIdRoute = JobsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => JobsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/access-code': typeof AccessCodeRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/jobs': typeof JobsRouteWithChildren
+  '/plans': typeof PlansRoute
+  '/post-job': typeof PostJobRoute
+  '/whatsapp-approval': typeof WhatsappApprovalRoute
+  '/jobs/$id': typeof JobsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/access-code': typeof AccessCodeRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/jobs': typeof JobsRouteWithChildren
+  '/plans': typeof PlansRoute
+  '/post-job': typeof PostJobRoute
+  '/whatsapp-approval': typeof WhatsappApprovalRoute
+  '/jobs/$id': typeof JobsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/access-code': typeof AccessCodeRoute
+  '/admin': typeof AdminRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/jobs': typeof JobsRouteWithChildren
+  '/plans': typeof PlansRoute
+  '/post-job': typeof PostJobRoute
+  '/whatsapp-approval': typeof WhatsappApprovalRoute
+  '/jobs/$id': typeof JobsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/access-code'
+    | '/admin'
+    | '/auth'
+    | '/dashboard'
+    | '/jobs'
+    | '/plans'
+    | '/post-job'
+    | '/whatsapp-approval'
+    | '/jobs/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/access-code'
+    | '/admin'
+    | '/auth'
+    | '/dashboard'
+    | '/jobs'
+    | '/plans'
+    | '/post-job'
+    | '/whatsapp-approval'
+    | '/jobs/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/access-code'
+    | '/admin'
+    | '/auth'
+    | '/dashboard'
+    | '/jobs'
+    | '/plans'
+    | '/post-job'
+    | '/whatsapp-approval'
+    | '/jobs/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccessCodeRoute: typeof AccessCodeRoute
+  AdminRoute: typeof AdminRoute
+  AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRoute
+  JobsRoute: typeof JobsRouteWithChildren
+  PlansRoute: typeof PlansRoute
+  PostJobRoute: typeof PostJobRoute
+  WhatsappApprovalRoute: typeof WhatsappApprovalRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/whatsapp-approval': {
+      id: '/whatsapp-approval'
+      path: '/whatsapp-approval'
+      fullPath: '/whatsapp-approval'
+      preLoaderRoute: typeof WhatsappApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/post-job': {
+      id: '/post-job'
+      path: '/post-job'
+      fullPath: '/post-job'
+      preLoaderRoute: typeof PostJobRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/plans': {
+      id: '/plans'
+      path: '/plans'
+      fullPath: '/plans'
+      preLoaderRoute: typeof PlansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jobs': {
+      id: '/jobs'
+      path: '/jobs'
+      fullPath: '/jobs'
+      preLoaderRoute: typeof JobsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/access-code': {
+      id: '/access-code'
+      path: '/access-code'
+      fullPath: '/access-code'
+      preLoaderRoute: typeof AccessCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +224,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jobs/$id': {
+      id: '/jobs/$id'
+      path: '/$id'
+      fullPath: '/jobs/$id'
+      preLoaderRoute: typeof JobsIdRouteImport
+      parentRoute: typeof JobsRoute
+    }
   }
 }
 
+interface JobsRouteChildren {
+  JobsIdRoute: typeof JobsIdRoute
+}
+
+const JobsRouteChildren: JobsRouteChildren = {
+  JobsIdRoute: JobsIdRoute,
+}
+
+const JobsRouteWithChildren = JobsRoute._addFileChildren(JobsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccessCodeRoute: AccessCodeRoute,
+  AdminRoute: AdminRoute,
+  AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRoute,
+  JobsRoute: JobsRouteWithChildren,
+  PlansRoute: PlansRoute,
+  PostJobRoute: PostJobRoute,
+  WhatsappApprovalRoute: WhatsappApprovalRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
