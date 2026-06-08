@@ -54,7 +54,6 @@ function PostJob() {
         budget_max: form.budget_max ? Number(form.budget_max) : null,
         city: form.city,
         area: form.area || null,
-        phone: form.phone,
         preferred_time: form.preferred_time || null,
         urgent: form.urgent,
       });
