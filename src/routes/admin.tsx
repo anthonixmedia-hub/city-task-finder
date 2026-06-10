@@ -207,7 +207,15 @@ function AdminContent() {
 
         {/* Audit Logs */}
         <section className="mt-8">
-          <h2 className="text-lg font-bold mb-3">Audit Log <span className="text-xs font-normal text-muted-foreground">(access codes & contact reveals)</span></h2>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
+            <h2 className="text-lg font-bold">Audit Log <span className="text-xs font-normal text-muted-foreground">(access codes & contact reveals)</span></h2>
+            <Input
+              value={auditSearch}
+              onChange={(e) => setAuditSearch(e.target.value)}
+              placeholder="Search by user ID, job ID, or code…"
+              className="md:w-80 h-9"
+            />
+          </div>
           <div className="rounded-2xl border border-border bg-card overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted text-left">
