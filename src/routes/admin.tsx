@@ -252,8 +252,8 @@ function AdminContent() {
                     <td className="p-3 text-xs text-muted-foreground">{l.reason ?? "—"}</td>
                   </tr>
                 ))}
-                {!auditLogs?.length && (
-                  <tr><td colSpan={6} className="p-6 text-center text-sm text-muted-foreground">No activity yet.</td></tr>
+                {!filteredAuditLogs.length && (
+                  <tr><td colSpan={6} className="p-6 text-center text-sm text-muted-foreground">{auditSearch ? "No matching events." : "No activity yet."}</td></tr>
                 )}
               </tbody>
             </table>
