@@ -204,6 +204,42 @@ function AdminContent() {
             </table>
           </div>
         </section>
+
+        {/* Audit Logs */}
+        <section className="mt-8">
+          <h2 className="text-lg font-bold mb-3">Audit Log <span className="text-xs font-normal text-muted-foreground">(access codes & contact reveals)</span></h2>
+          <div className="rounded-2xl border border-border bg-card overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted text-left">
+                <tr>
+                  <th className="p-3">When</th>
+                  <th className="p-3">Action</th>
+                  <th className="p-3">Actor</th>
+                  <th className="p-3">Target</th>
+                  <th className="p-3">Result</th>
+                  <th className="p-3">Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {auditLogs?.map((l: any) => (
+                  <tr key={l.id} className="border-t border-border">
+                    <td className="p-3 whitespace-nowrap text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
+                    <td className="p-3 font-medium">{l.action}</td>
+                    <td className="p-3 font-mono text-xs">{l.actor_id ? l.actor_id.slice(0, 8) : "—"}</td>
+                    <td className="p-3 font-mono text-xs">{l.target_type ?? "—"}{l.target_id ? `:${l.target_id.slice(0, 8)}` : ""}</td>
+                    <td className="p-3">
+                      <Badge variant={l.success ? "default" : "destructive"}>{l.success ? "OK" : "DENIED"}</Badge>
+                    </td>
+                    <td className="p-3 text-xs text-muted-foreground">{l.reason ?? "—"}</td>
+                  </tr>
+                ))}
+                {!auditLogs?.length && (
+                  <tr><td colSpan={6} className="p-6 text-center text-sm text-muted-foreground">No activity yet.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </PageShell>
   );
