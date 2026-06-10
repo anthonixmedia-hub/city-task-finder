@@ -1,25 +1,38 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { ShieldCheck, KeyRound, Users, Briefcase, Plus, Copy } from "lucide-react";
+import {
+  LayoutDashboard, Briefcase, Users, Tags, KeyRound, ScrollText, Settings,
+  ExternalLink, Menu, X, ShieldCheck, LogOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { PageShell } from "@/components/layout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { toast } from "sonner";
-import { timeAgo } from "@/lib/format";
+import logoAsset from "@/assets/logo.png.asset.json";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({ meta: [{ title: "Admin — MyCityRozgar.in" }] }),
-  component: AdminPage,
+  component: AdminLayout,
 });
 
-function AdminPage() {
+type NavItem = { to: string; label: string; icon: any; exact?: boolean };
+const navItems: NavItem[] = [
+  { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { to: "/admin/jobs", label: "Jobs", icon: Briefcase },
+  { to: "/admin/users", label: "Users", icon: Users },
+  { to: "/admin/categories", label: "Categories", icon: Tags },
+  { to: "/admin/codes", label: "Access Codes", icon: KeyRound },
+  { to: "/admin/audit", label: "Audit Log", icon: ScrollText },
+  { to: "/admin/settings", label: "Site Settings", icon: Settings },
+];
+
+function AdminLayout() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => { setMobileOpen(false); }, [pathname]);
 
   useEffect(() => {
     if (loading) return;
@@ -29,247 +42,94 @@ function AdminPage() {
   }, [user, loading, navigate]);
 
   if (loading || isAdmin === null) {
-    return <PageShell><div className="container-app py-10">Loading…</div></PageShell>;
+    return <div className="min-h-screen grid place-items-center text-muted-foreground">Loading admin…</div>;
   }
   if (!isAdmin) {
     return (
-      <PageShell>
-        <div className="container-app py-12 max-w-md text-center">
+      <div className="min-h-screen grid place-items-center p-6">
+        <div className="max-w-md text-center">
           <ShieldCheck className="h-12 w-12 mx-auto text-muted-foreground"/>
           <h1 className="text-2xl font-bold mt-3">Admins only</h1>
           <p className="text-muted-foreground mt-2 text-sm">
-            This area is restricted. If you are an admin, ask the team to grant you the admin role in the database.
+            This area is restricted. Ask the team to grant you the admin role.
           </p>
+          <Link to="/"><Button className="mt-5" variant="outline">Back to site</Button></Link>
         </div>
-      </PageShell>
-    );
-  }
-
-  return <AdminContent/>;
-}
-
-function AdminContent() {
-  const { data: stats } = useQuery({
-    queryKey: ["admin-stats"],
-    queryFn: async () => {
-      const [users, jobs, codes] = await Promise.all([
-        supabase.from("profiles").select("id, plan, role"),
-        supabase.from("jobs").select("id, status"),
-        supabase.from("access_codes").select("id, used"),
-      ]);
-      const profiles = users.data ?? [];
-      return {
-        totalUsers: profiles.length,
-        customers: profiles.filter(p => p.role === "customer").length,
-        workers: profiles.filter(p => p.role === "worker").length,
-        premium: profiles.filter(p => p.plan === "premium").length,
-        pro: profiles.filter(p => p.plan === "professional").length,
-        totalJobs: jobs.data?.length ?? 0,
-        activeJobs: jobs.data?.filter(j => j.status === "active").length ?? 0,
-        codesIssued: codes.data?.length ?? 0,
-        codesUsed: codes.data?.filter(c => c.used).length ?? 0,
-      };
-    },
-  });
-
-  const { data: codes, refetch: refetchCodes } = useQuery({
-    queryKey: ["admin-codes"],
-    queryFn: async () => (await supabase.from("access_codes").select("*").order("created_at", { ascending: false }).limit(50)).data ?? [],
-  });
-
-  const { data: recentUsers } = useQuery({
-    queryKey: ["admin-users"],
-    queryFn: async () => (await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(20)).data ?? [],
-  });
-
-  const { data: recentJobs } = useQuery({
-    queryKey: ["admin-jobs"],
-    queryFn: async () => (await supabase.from("jobs").select("id,customer_id,title,category_slug,city,area,status,urgent,responses_count,created_at").order("created_at", { ascending: false }).limit(20)).data ?? [],
-  });
-
-  const { data: auditLogs } = useQuery({
-    queryKey: ["admin-audit-logs"],
-    queryFn: async () => (await supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(100)).data ?? [],
-    refetchInterval: 15000,
-  });
-
-  const [planForNew, setPlanForNew] = useState<"premium" | "professional">("premium");
-  const [auditSearch, setAuditSearch] = useState("");
-  const filteredAuditLogs = (auditLogs ?? []).filter((l: any) => {
-    const q = auditSearch.trim().toLowerCase();
-    if (!q) return true;
-    const code = (l.details && (l.details.code || l.details.access_code)) || "";
-    return (
-      (l.actor_id ?? "").toLowerCase().includes(q) ||
-      (l.target_id ?? "").toLowerCase().includes(q) ||
-      String(code).toLowerCase().includes(q)
-    );
-  });
-  const [creating, setCreating] = useState(false);
-
-  async function issueCode() {
-    setCreating(true);
-    try {
-      // generate next code MCR-NNNNNN
-      const seq = 100001 + (codes?.length ?? 0);
-      const code = `MCR-${seq}`;
-      const { error } = await supabase.from("access_codes").insert({ code, plan: planForNew });
-      if (error) throw error;
-      toast.success(`Access code ${code} issued`);
-      refetchCodes();
-    } catch (err: any) {
-      toast.error(err.message ?? "Could not issue code");
-    } finally {
-      setCreating(false);
-    }
-  }
-
-  return (
-    <PageShell>
-      <div className="container-app py-6 md:py-8">
-        <h1 className="text-2xl md:text-3xl font-bold">Admin Panel</h1>
-        <p className="text-muted-foreground text-sm">Manage users, jobs, and access codes.</p>
-
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-          <S icon={Users} label="Users" value={stats?.totalUsers ?? 0}/>
-          <S icon={Briefcase} label="Jobs" value={stats?.totalJobs ?? 0}/>
-          <S icon={ShieldCheck} label="Premium / Pro" value={`${stats?.premium ?? 0} / ${stats?.pro ?? 0}`}/>
-          <S icon={KeyRound} label="Codes Used / Issued" value={`${stats?.codesUsed ?? 0} / ${stats?.codesIssued ?? 0}`}/>
-        </div>
-
-        {/* Access codes */}
-        <section className="mt-8">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold">Access Codes</h2>
-            <div className="flex items-center gap-2">
-              <select value={planForNew} onChange={e => setPlanForNew(e.target.value as any)} className="h-9 rounded-md border border-input px-2 text-sm">
-                <option value="premium">Premium</option>
-                <option value="professional">Professional</option>
-              </select>
-              <Button size="sm" onClick={issueCode} disabled={creating}><Plus className="h-4 w-4 mr-1"/>Issue Code</Button>
-            </div>
-          </div>
-          <div className="rounded-2xl border border-border bg-card overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-left">
-                <tr><th className="p-3">Code</th><th className="p-3">Plan</th><th className="p-3">Status</th><th className="p-3">Assigned</th><th className="p-3"></th></tr>
-              </thead>
-              <tbody>
-                {codes?.map(c => (
-                  <tr key={c.id} className="border-t border-border">
-                    <td className="p-3 font-mono">{c.code}</td>
-                    <td className="p-3 capitalize">{c.plan}</td>
-                    <td className="p-3">{c.used ? <Badge variant="secondary">Used</Badge> : <Badge>Available</Badge>}</td>
-                    <td className="p-3 text-xs text-muted-foreground">{c.assigned_to ?? "—"}</td>
-                    <td className="p-3"><Button size="sm" variant="ghost" onClick={() => { navigator.clipboard.writeText(c.code); toast.success("Copied"); }}><Copy className="h-4 w-4"/></Button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Users */}
-        <section className="mt-8">
-          <h2 className="text-lg font-bold mb-3">Recent Users</h2>
-          <div className="rounded-2xl border border-border bg-card overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-left">
-                <tr><th className="p-3">Name</th><th className="p-3">Role</th><th className="p-3">Plan</th><th className="p-3">City</th><th className="p-3">Mobile</th><th className="p-3">Joined</th></tr>
-              </thead>
-              <tbody>
-                {recentUsers?.map(u => (
-                  <tr key={u.id} className="border-t border-border">
-                    <td className="p-3 font-medium">{u.full_name || "—"}</td>
-                    <td className="p-3 capitalize">{u.role}</td>
-                    <td className="p-3 capitalize">{u.plan}</td>
-                    <td className="p-3">{u.city}</td>
-                    <td className="p-3">{u.mobile ?? "—"}</td>
-                    <td className="p-3 text-xs text-muted-foreground">{timeAgo(u.created_at)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Jobs */}
-        <section className="mt-8">
-          <h2 className="text-lg font-bold mb-3">Recent Jobs</h2>
-          <div className="rounded-2xl border border-border bg-card overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-left">
-                <tr><th className="p-3">Title</th><th className="p-3">Category</th><th className="p-3">City</th><th className="p-3">Status</th><th className="p-3">Posted</th></tr>
-              </thead>
-              <tbody>
-                {recentJobs?.map(j => (
-                  <tr key={j.id} className="border-t border-border">
-                    <td className="p-3 font-medium">{j.title}</td>
-                    <td className="p-3 capitalize">{j.category_slug.replace(/-/g," ")}</td>
-                    <td className="p-3">{j.city}</td>
-                    <td className="p-3"><Badge variant={j.status === "active" ? "default" : "outline"} className="capitalize">{j.status}</Badge></td>
-                    <td className="p-3 text-xs text-muted-foreground">{timeAgo(j.created_at)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* Audit Logs */}
-        <section className="mt-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
-            <h2 className="text-lg font-bold">Audit Log <span className="text-xs font-normal text-muted-foreground">(access codes & contact reveals)</span></h2>
-            <Input
-              value={auditSearch}
-              onChange={(e) => setAuditSearch(e.target.value)}
-              placeholder="Search by user ID, job ID, or code…"
-              className="md:w-80 h-9"
-            />
-          </div>
-          <div className="rounded-2xl border border-border bg-card overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted text-left">
-                <tr>
-                  <th className="p-3">When</th>
-                  <th className="p-3">Action</th>
-                  <th className="p-3">Actor</th>
-                  <th className="p-3">Target</th>
-                  <th className="p-3">Result</th>
-                  <th className="p-3">Reason</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredAuditLogs.map((l: any) => (
-                  <tr key={l.id} className="border-t border-border">
-                    <td className="p-3 whitespace-nowrap text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
-                    <td className="p-3 font-medium">{l.action}</td>
-                    <td className="p-3 font-mono text-xs">{l.actor_id ? l.actor_id.slice(0, 8) : "—"}</td>
-                    <td className="p-3 font-mono text-xs">{l.target_type ?? "—"}{l.target_id ? `:${l.target_id.slice(0, 8)}` : ""}</td>
-                    <td className="p-3">
-                      <Badge variant={l.success ? "default" : "destructive"}>{l.success ? "OK" : "DENIED"}</Badge>
-                    </td>
-                    <td className="p-3 text-xs text-muted-foreground">{l.reason ?? "—"}</td>
-                  </tr>
-                ))}
-                {!filteredAuditLogs.length && (
-                  <tr><td colSpan={6} className="p-6 text-center text-sm text-muted-foreground">{auditSearch ? "No matching events." : "No activity yet."}</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
       </div>
-    </PageShell>
-  );
-}
+    );
+  }
 
-function S({ icon: Icon, label, value }: any) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-4">
-      <Icon className="h-5 w-5 text-primary"/>
-      <div className="text-xl font-bold mt-2">{value}</div>
-      <div className="text-xs text-muted-foreground">{label}</div>
+    <div className="min-h-screen flex bg-muted/30">
+      {/* Sidebar */}
+      <aside
+        className={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-card border-r border-border flex-col
+          ${mobileOpen ? "flex" : "hidden md:flex"}`}
+      >
+        <div className="h-14 flex items-center gap-2 px-4 border-b border-border">
+          <img src={logoAsset.url} alt="MCR" className="h-8 w-8 rounded-md object-contain"/>
+          <div>
+            <div className="font-bold text-sm leading-tight">MyCityRozgar</div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Admin Panel</div>
+          </div>
+        </div>
+        <nav className="flex-1 overflow-y-auto p-2 space-y-0.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = item.exact ? pathname === item.to : pathname === item.to || pathname.startsWith(item.to + "/");
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors
+                  ${active ? "bg-primary text-primary-foreground font-medium" : "hover:bg-muted text-foreground/80"}`}
+              >
+                <Icon className="h-4 w-4"/>
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="p-2 border-t border-border space-y-1">
+          <Link to="/" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-muted">
+            <ExternalLink className="h-4 w-4"/> View site
+          </Link>
+          <button
+            onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/" }); }}
+            className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm hover:bg-muted text-left"
+          >
+            <LogOut className="h-4 w-4"/> Sign out
+          </button>
+        </div>
+      </aside>
+
+      {/* Overlay on mobile */}
+      {mobileOpen && (
+        <div className="fixed inset-0 bg-black/40 z-30 md:hidden" onClick={() => setMobileOpen(false)}/>
+      )}
+
+      {/* Main */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="h-14 sticky top-0 z-20 bg-card border-b border-border flex items-center px-3 md:px-5 gap-3">
+          <button
+            className="md:hidden h-9 w-9 grid place-items-center rounded-md hover:bg-muted"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="h-5 w-5"/> : <Menu className="h-5 w-5"/>}
+          </button>
+          <div className="font-semibold text-sm truncate">
+            {navItems.find((n) => n.exact ? pathname === n.to : pathname === n.to || pathname.startsWith(n.to + "/"))?.label ?? "Admin"}
+          </div>
+          <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground truncate max-w-[40%]">
+            <span className="hidden sm:inline">Signed in as</span>
+            <span className="font-medium text-foreground truncate">{user?.email}</span>
+          </div>
+        </header>
+        <main className="flex-1 p-3 md:p-6 min-w-0">
+          <Outlet/>
+        </main>
+      </div>
     </div>
   );
 }
