@@ -28,7 +28,7 @@ function UsersPage() {
   });
   const adminSet = new Set((adminRoles ?? []).map((r: any) => r.user_id));
 
-  async function setPlan(id: string, plan: string) {
+  async function setPlan(id: string, plan: "free" | "premium" | "professional") {
     const { error } = await supabase.from("profiles").update({ plan, access_unlocked: plan !== "free" }).eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Plan updated"); refetch(); }
   }

@@ -23,7 +23,7 @@ function JobsPage() {
     queryFn: async () => (await supabase.from("jobs").select("*").order("created_at", { ascending: false }).limit(500)).data ?? [],
   });
 
-  async function setJobStatus(id: string, value: string) {
+  async function setJobStatus(id: string, value: "active" | "closed" | "completed") {
     const { error } = await supabase.from("jobs").update({ status: value }).eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Updated"); refetch(); }
   }
@@ -57,7 +57,7 @@ function JobsPage() {
             <option value="all">All</option>
             <option value="active">Active</option>
             <option value="closed">Closed</option>
-            <option value="filled">Filled</option>
+            <option value="completed">Completed</option>
           </select>
         </div>
       </div>
