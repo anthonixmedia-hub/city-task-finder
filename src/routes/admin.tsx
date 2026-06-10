@@ -94,6 +94,17 @@ function AdminContent() {
   });
 
   const [planForNew, setPlanForNew] = useState<"premium" | "professional">("premium");
+  const [auditSearch, setAuditSearch] = useState("");
+  const filteredAuditLogs = (auditLogs ?? []).filter((l: any) => {
+    const q = auditSearch.trim().toLowerCase();
+    if (!q) return true;
+    const code = (l.details && (l.details.code || l.details.access_code)) || "";
+    return (
+      (l.actor_id ?? "").toLowerCase().includes(q) ||
+      (l.target_id ?? "").toLowerCase().includes(q) ||
+      String(code).toLowerCase().includes(q)
+    );
+  });
   const [creating, setCreating] = useState(false);
 
   async function issueCode() {
@@ -207,7 +218,15 @@ function AdminContent() {
 
         {/* Audit Logs */}
         <section className="mt-8">
-          <h2 className="text-lg font-bold mb-3">Audit Log <span className="text-xs font-normal text-muted-foreground">(access codes & contact reveals)</span></h2>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-3">
+            <h2 className="text-lg font-bold">Audit Log <span className="text-xs font-normal text-muted-foreground">(access codes & contact reveals)</span></h2>
+            <Input
+              value={auditSearch}
+              onChange={(e) => setAuditSearch(e.target.value)}
+              placeholder="Search by user ID, job ID, or code…"
+              className="md:w-80 h-9"
+            />
+          </div>
           <div className="rounded-2xl border border-border bg-card overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted text-left">
@@ -221,7 +240,7 @@ function AdminContent() {
                 </tr>
               </thead>
               <tbody>
-                {auditLogs?.map((l: any) => (
+                {filteredAuditLogs.map((l: any) => (
                   <tr key={l.id} className="border-t border-border">
                     <td className="p-3 whitespace-nowrap text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
                     <td className="p-3 font-medium">{l.action}</td>
@@ -233,8 +252,8 @@ function AdminContent() {
                     <td className="p-3 text-xs text-muted-foreground">{l.reason ?? "—"}</td>
                   </tr>
                 ))}
-                {!auditLogs?.length && (
-                  <tr><td colSpan={6} className="p-6 text-center text-sm text-muted-foreground">No activity yet.</td></tr>
+                {!filteredAuditLogs.length && (
+                  <tr><td colSpan={6} className="p-6 text-center text-sm text-muted-foreground">{auditSearch ? "No matching events." : "No activity yet."}</td></tr>
                 )}
               </tbody>
             </table>
