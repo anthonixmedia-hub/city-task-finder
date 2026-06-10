@@ -94,7 +94,7 @@ function UsersPage() {
                   </td>
                   <td className="p-3 capitalize">{u.role}</td>
                   <td className="p-3">
-                    <select value={u.plan} onChange={(e) => setPlan(u.id, e.target.value)} className="h-8 rounded-md border border-input px-2 text-xs bg-background capitalize">
+                    <select value={u.plan} onChange={(e) => setPlan(u.id, e.target.value as "free" | "premium" | "professional")} className="h-8 rounded-md border border-input px-2 text-xs bg-background capitalize">
                       <option value="free">Free</option>
                       <option value="premium">Premium</option>
                       <option value="professional">Professional</option>
