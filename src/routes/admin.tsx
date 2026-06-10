@@ -94,6 +94,17 @@ function AdminContent() {
   });
 
   const [planForNew, setPlanForNew] = useState<"premium" | "professional">("premium");
+  const [auditSearch, setAuditSearch] = useState("");
+  const filteredAuditLogs = (auditLogs ?? []).filter((l: any) => {
+    const q = auditSearch.trim().toLowerCase();
+    if (!q) return true;
+    const code = (l.details && (l.details.code || l.details.access_code)) || "";
+    return (
+      (l.actor_id ?? "").toLowerCase().includes(q) ||
+      (l.target_id ?? "").toLowerCase().includes(q) ||
+      String(code).toLowerCase().includes(q)
+    );
+  });
   const [creating, setCreating] = useState(false);
 
   async function issueCode() {
