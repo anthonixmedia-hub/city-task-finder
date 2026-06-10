@@ -240,7 +240,7 @@ function AdminContent() {
                 </tr>
               </thead>
               <tbody>
-                {auditLogs?.map((l: any) => (
+                {filteredAuditLogs.map((l: any) => (
                   <tr key={l.id} className="border-t border-border">
                     <td className="p-3 whitespace-nowrap text-xs text-muted-foreground">{new Date(l.created_at).toLocaleString()}</td>
                     <td className="p-3 font-medium">{l.action}</td>
