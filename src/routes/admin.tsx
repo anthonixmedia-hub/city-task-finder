@@ -87,6 +87,12 @@ function AdminContent() {
     queryFn: async () => (await supabase.from("jobs").select("id,customer_id,title,category_slug,city,area,status,urgent,responses_count,created_at").order("created_at", { ascending: false }).limit(20)).data ?? [],
   });
 
+  const { data: auditLogs } = useQuery({
+    queryKey: ["admin-audit-logs"],
+    queryFn: async () => (await supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(100)).data ?? [],
+    refetchInterval: 15000,
+  });
+
   const [planForNew, setPlanForNew] = useState<"premium" | "professional">("premium");
   const [creating, setCreating] = useState(false);
 
